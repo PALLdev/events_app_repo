@@ -49,7 +49,7 @@ const EventSearch = ({ onSearch }: EventSearchProps) => {
         </div>
       </div>
 
-      <Button onClick={() => {}}>Buscar eventos</Button>
+      <Button>Buscar eventos</Button>
     </form>
   );
 };

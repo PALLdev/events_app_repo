@@ -12,6 +12,9 @@ const Navbar = () => {
           <li>
             <Link href="/events">Todos los eventos</Link>
           </li>
+          <li>
+            <Link href="/feedback">Enviar feedback</Link>
+          </li>
         </ul>
       </nav>
     </header>

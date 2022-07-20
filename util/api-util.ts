@@ -1,4 +1,6 @@
-import EventType from "./types";
+import path from "path";
+import fs from "fs";
+import { FeedbackType, EventType } from "./types";
 
 export const getAllEvents = async () => {
   const response = await fetch(
@@ -46,4 +48,22 @@ export const getFilteredEvents = async (dateFilter: DateFilter) => {
   });
 
   return filteredEvents;
+};
+
+export const buildPathToFile = () => {
+  const builtPath = path.join(process.cwd(), "data", "feedback.json");
+  return builtPath;
+};
+
+export const extractFeedbackData = (filePath: string) => {
+  const fileData = fs.readFileSync(filePath);
+  const data: Array<FeedbackType> = JSON.parse(fileData.toString());
+  return data;
+};
+
+export const saveToFile = (
+  filePath: string,
+  feedbackList: Array<FeedbackType>
+) => {
+  fs.writeFileSync(filePath, JSON.stringify(feedbackList));
 };
