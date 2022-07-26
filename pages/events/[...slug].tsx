@@ -6,8 +6,8 @@ import Button from "../../components/ui/Button";
 import ErrorAlert from "../../components/ui/ErrorAlert";
 import useSWR from "swr";
 import { useEffect, useState } from "react";
-import EventType from "../../util/types";
 import Head from "next/head";
+import { EventType } from "../../util/types";
 
 const FilteredResultPage: NextPage = () => {
   const [loadedEvents, setLoadedEvents] = useState<Array<EventType>>();
@@ -38,7 +38,7 @@ const FilteredResultPage: NextPage = () => {
       <title>Resultados del filtro de eventos</title>
       <meta
         name="description"
-        content={`Listado de todos los eventos filtrados`}
+        content="Listado de todos los eventos filtrados"
       />
     </Head>
   );
@@ -58,13 +58,12 @@ const FilteredResultPage: NextPage = () => {
   const numYear = +filteredYear;
   const numMonth = +filteredMonth;
 
+  const contentMessage = `Todos los eventos para ${numMonth}/${numYear}`;
+
   pageHeadData = (
     <Head>
       <title>Resultados del filtro de eventos</title>
-      <meta
-        name="description"
-        content={`Todos los eventos para ${numMonth}/${numYear}`}
-      />
+      <meta name="description" content={contentMessage} />
     </Head>
   );
 

@@ -18,7 +18,7 @@ const EventsPage: NextPage = ({
   return (
     <>
       <Head>
-        <title>Todos los Eventos NextJS-Firebase </title>
+        <title>Todos los Eventos NextJS-Firebase</title>
         <meta
           name="description"
           content="Encuentra una lista con todos nuestros eventos realizados y por realizar.."

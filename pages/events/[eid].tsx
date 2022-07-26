@@ -8,6 +8,7 @@ import Head from "next/head";
 import EventContent from "../../components/event-detail/EventContent";
 import EventLogistics from "../../components/event-detail/EventLogistics";
 import EventSummary from "../../components/event-detail/EventSummary";
+import Comments from "../../components/input/Comments";
 import { getEventById, getFeaturedEvents } from "../../util/api-util";
 
 const EventDetailPage: NextPage = ({
@@ -24,7 +25,7 @@ const EventDetailPage: NextPage = ({
   return (
     <>
       <Head>
-        <title>{selectedEvent.title} </title>
+        <title>{selectedEvent.title}</title>
         <meta name="description" content={selectedEvent.description} />
       </Head>
       <EventSummary title={selectedEvent.title} />
@@ -37,6 +38,7 @@ const EventDetailPage: NextPage = ({
       <EventContent>
         <p>{selectedEvent.description}</p>
       </EventContent>
+      <Comments eventId={selectedEvent.id} />
     </>
   );
 };

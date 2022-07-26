@@ -1,6 +1,7 @@
 import type { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
 import Head from "next/head";
 import EventList from "../components/events/EventList";
+import NewsletterRegistration from "../components/input/NewsletterRegistration";
 import { getFeaturedEvents } from "../util/api-util";
 
 const StartingPage: NextPage = ({
@@ -9,12 +10,13 @@ const StartingPage: NextPage = ({
   return (
     <>
       <Head>
-        <title>Aplicación de Eventos NextJS-Firebase </title>
+        <title>Aplicación de Eventos NextJS-Firebase</title>
         <meta
           name="description"
           content="Encuentras variados eventos a los que acudir en tu ciudad"
         />
       </Head>
+      <NewsletterRegistration />
       <EventList items={events} />
     </>
   );

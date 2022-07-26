@@ -9,7 +9,7 @@ const EventsPage: NextPage = ({
   return (
     <>
       <Head>
-        <title>Feedback NextJS-Firebase </title>
+        <title>Feedback NextJS-Firebase</title>
         <meta
           name="description"
           content="Envianos feedback para mejorar nuestra pagina.."

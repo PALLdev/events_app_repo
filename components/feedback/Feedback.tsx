@@ -67,7 +67,7 @@ const Feedback = ({ feedbackList }: FeedbackProps) => {
           {feedbackDetails && <p>{feedbackDetails.email}</p>}
           <ul>
             {feedbackList.map((feedback) => (
-              <li>
+              <li key={feedback.id}>
                 {feedback.text}{" "}
                 <button onClick={loadFeedbackHandler.bind(null, feedback.id)}>
                   Mostrar detalles

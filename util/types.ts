@@ -12,3 +12,9 @@ export type FeedbackType = {
   email: string;
   text: string;
 };
+
+export type CommentType = {
+  email: string;
+  name: string;
+  text: string;
+};
