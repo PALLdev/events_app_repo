@@ -18,3 +18,9 @@ export type CommentType = {
   name: string;
   text: string;
 };
+
+export type CommentsResType = {
+  id: string;
+  name: string;
+  text: string;
+};

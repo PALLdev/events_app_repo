@@ -1,21 +1,22 @@
+import { CommentsResType } from "../../util/types";
 import classes from "./CommentList.module.css";
 
-const CommentList = () => {
+type CommentListProps = {
+  items: Array<CommentsResType>;
+};
+
+const CommentList = ({ items }: CommentListProps) => {
   return (
     <ul className={classes.comments}>
       {/* Render list of comments - fetched from API */}
-      <li>
-        <p>Mi comentario es asombroso!</p>
-        <div>
-          Por <address>Maximiliano</address>
-        </div>
-      </li>
-      <li>
-        <p>Mi comentario es de otro mundo!</p>
-        <div>
-          Por <address>Maximiliano</address>
-        </div>
-      </li>
+      {items.map((comment) => (
+        <li key={comment.id}>
+          <p>{comment.text}</p>
+          <div>
+            Por <address>{comment.name}</address>
+          </div>
+        </li>
+      ))}
     </ul>
   );
 };
