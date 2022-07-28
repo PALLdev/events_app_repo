@@ -1,30 +1,56 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { CommentsResType, CommentType } from "../../../util/types";
+import { CommentBodyType } from "../../../util/types";
+import { MongoClient, ObjectId } from "mongodb";
+
+type CommentCollection = {
+  _id?: ObjectId;
+  eventId?: string | string[];
+  email?: string;
+  name: string;
+  text: string;
+};
 
 type Data = {
   message: string;
-  addedComment?: CommentType;
-  comments?: Array<CommentsResType>;
+  addedComment?: CommentCollection;
+  comments?: Array<CommentCollection>;
 };
 
-export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
+export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   const eventId = req.query.eventId;
 
+  const uri =
+    "mongodb+srv://pablo:jqZvb5vhiyqNNHGk@clusterpuntosapp.cfo6t.mongodb.net/?retryWrites=true&w=majority";
+  const client = new MongoClient(uri);
+
   if (req.method === "GET") {
-    const dummyList: Array<CommentsResType> = [
-      { id: "comentario1", name: "Juan", text: "Anda a acostarte hombre!" },
-      { id: "comentario2", name: "Pedro", text: "Este es el comentario 2!" },
-      { id: "comentario3", name: "Tulio", text: "Juanito queso fresco!" },
-      { id: "comentario4", name: "Andres", text: "Tulio animal!" },
-    ];
-    console.log("SOY UN GET REQUEST");
+    const database = client.db("events_app");
+    const comments = database.collection<CommentCollection>("comments");
+
+    const cursor = comments.find<CommentCollection>(
+      { eventId: { $eq: eventId } },
+      {
+        sort: { _id: -1 },
+        projection: { _id: 1, name: 1, text: 1 },
+      }
+    );
+    const eventComments = await cursor.toArray();
+
+    const mappedComments = eventComments.map((eventComment) => {
+      return {
+        id: eventComment._id?.toJSON(),
+        text: eventComment.text,
+        name: eventComment.name,
+      };
+    });
+
     res
       .status(200)
-      .json({ message: "mostrando todos coments", comments: dummyList });
+      .json({ message: "mostrando todos coments", comments: mappedComments });
   }
 
   if (req.method === "POST") {
-    const { name, email, text } = req.body as CommentType;
+    const { name, email, text } = req.body as CommentBodyType;
 
     if (
       !name ||
@@ -39,18 +65,24 @@ export default (req: NextApiRequest, res: NextApiResponse<Data>) => {
       return;
     }
 
-    const newComment = {
-      id: new Date().toISOString(),
+    const database = client.db("events_app");
+    const comments = database.collection<CommentCollection>("comments");
+
+    const newComment: CommentCollection = {
+      eventId,
       email,
       name,
       text,
     };
 
-    console.log(newComment);
+    const result = await comments.insertOne(newComment);
+    newComment._id = result.insertedId;
 
     res.status(201).json({
       message: "comentario agregado exitosamente",
       addedComment: newComment,
     });
   }
+
+  client.close();
 };

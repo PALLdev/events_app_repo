@@ -1,9 +1,9 @@
 import { FormEvent, useRef, useState } from "react";
-import { CommentType } from "../../util/types";
+import { CommentBodyType } from "../../util/types";
 import classes from "./NewComment.module.css";
 
 type NewCommentProps = {
-  onAddComment: (comment: CommentType) => void;
+  onAddComment: (comment: CommentBodyType) => void;
 };
 
 const NewComment = ({ onAddComment }: NewCommentProps) => {

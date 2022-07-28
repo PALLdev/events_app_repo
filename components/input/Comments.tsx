@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CommentsResType, CommentType } from "../../util/types";
+import { CommentsResType, CommentBodyType } from "../../util/types";
 import CommentList from "./CommentList";
 import classes from "./Comments.module.css";
 import NewComment from "./NewComment";
@@ -20,7 +20,6 @@ const Comments = ({ eventId }: CommentsProps) => {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setCommentsList(data.comments);
         });
     }
@@ -30,7 +29,7 @@ const Comments = ({ eventId }: CommentsProps) => {
     setShowComments((prevState) => !prevState);
   };
 
-  const addCommentHandler = (commentData: CommentType) => {
+  const addCommentHandler = (commentData: CommentBodyType) => {
     // send data to API
     fetch(`/api/comments/${eventId}`, {
       method: "POST",

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import EventType from "../../util/types";
+import { EventType } from "../../util/types";
 import AddressIcon from "../icons/AddressIcon";
 import ArrowRightIcon from "../icons/ArrowRightIcon";
 import DateIcon from "../icons/DateIcon";
@@ -23,6 +23,7 @@ const EventItem = ({ id, title, image, date, location }: EventType) => {
         alt={`Foto referencia ${title}`}
         width={250}
         height={160}
+        priority
       />
       <div className={classes.content}>
         <div className={classes.summary}>

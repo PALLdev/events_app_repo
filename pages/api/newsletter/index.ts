@@ -1,11 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { MongoClient } from "mongodb";
 
 type NewsletterPOSTResponseData = {
   message: string;
-  email?: string;
 };
 
-export default function handler(
+type NewsletterEmailCollection = {
+  email: string;
+};
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<NewsletterPOSTResponseData>
 ) {
@@ -16,10 +20,21 @@ export default function handler(
       res.status(422).json({ message: "error en el email" });
       return;
     }
-    console.log(userEmail);
+
+    const uri =
+      "mongodb+srv://pablo:jqZvb5vhiyqNNHGk@clusterpuntosapp.cfo6t.mongodb.net/?retryWrites=true&w=majority";
+    const client = new MongoClient(uri);
+
+    const database = client.db("events_app");
+
+    const newsletterEmails =
+      database.collection<NewsletterEmailCollection>("newsletter");
+
+    await newsletterEmails.insertOne({ email: userEmail });
+
+    client.close();
+
     // status code for resource added or saved correctly
-    res
-      .status(201)
-      .json({ message: "agregado exitosamente", email: userEmail });
+    res.status(201).json({ message: "agregado exitosamente" });
   }
 }

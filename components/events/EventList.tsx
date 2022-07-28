@@ -1,4 +1,4 @@
-import EventType from "../../util/types";
+import { EventType } from "../../util/types";
 import EventItem from "./EventItem";
 import classes from "./EventList.module.css";
 
