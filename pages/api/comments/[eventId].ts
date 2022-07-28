@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { CommentBodyType } from "../../../util/types";
 import { MongoClient, ObjectId } from "mongodb";
+import {
+  connectToDatabase,
+  getDocumentsForFilter,
+  insertDocument,
+} from "../../../util/helpers";
 
 type CommentCollection = {
   _id?: ObjectId;
@@ -17,36 +22,45 @@ type Data = {
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
+  let client: MongoClient;
+
   const eventId = req.query.eventId;
 
-  const uri =
-    "mongodb+srv://pablo:jqZvb5vhiyqNNHGk@clusterpuntosapp.cfo6t.mongodb.net/?retryWrites=true&w=majority";
-  const client = new MongoClient(uri);
+  try {
+    client = await connectToDatabase();
+  } catch (error) {
+    res.status(500).json({
+      message: "Se produjo un fallo al conectar con la DB",
+    });
+    return;
+  }
 
   if (req.method === "GET") {
-    const database = client.db("events_app");
-    const comments = database.collection<CommentCollection>("comments");
+    try {
+      const eventComments = await getDocumentsForFilter<CommentCollection>(
+        client,
+        "comments",
+        { eventId: { $eq: eventId } },
+        { _id: -1 },
+        { _id: 1, name: 1, text: 1 }
+      );
 
-    const cursor = comments.find<CommentCollection>(
-      { eventId: { $eq: eventId } },
-      {
-        sort: { _id: -1 },
-        projection: { _id: 1, name: 1, text: 1 },
-      }
-    );
-    const eventComments = await cursor.toArray();
+      const mappedComments = eventComments.map((eventComment) => {
+        return {
+          id: eventComment._id?.toJSON(),
+          text: eventComment.text,
+          name: eventComment.name,
+        };
+      });
 
-    const mappedComments = eventComments.map((eventComment) => {
-      return {
-        id: eventComment._id?.toJSON(),
-        text: eventComment.text,
-        name: eventComment.name,
-      };
-    });
-
-    res
-      .status(200)
-      .json({ message: "mostrando todos coments", comments: mappedComments });
+      res
+        .status(200)
+        .json({ message: "mostrando todos coments", comments: mappedComments });
+    } catch (error) {
+      res.status(500).json({
+        message: "Se produjo un fallo al traer los datos de la DB",
+      });
+    }
   }
 
   if (req.method === "POST") {
@@ -62,11 +76,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       text.trim() === ""
     ) {
       res.status(422).json({ message: "Formulario invalido" });
+      client.close();
       return;
     }
-
-    const database = client.db("events_app");
-    const comments = database.collection<CommentCollection>("comments");
 
     const newComment: CommentCollection = {
       eventId,
@@ -75,13 +87,23 @@ export default async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       text,
     };
 
-    const result = await comments.insertOne(newComment);
-    newComment._id = result.insertedId;
+    try {
+      const result = await insertDocument<CommentCollection>(
+        client,
+        "comments",
+        newComment
+      );
+      newComment._id = result.insertedId;
 
-    res.status(201).json({
-      message: "comentario agregado exitosamente",
-      addedComment: newComment,
-    });
+      res.status(201).json({
+        message: "comentario agregado exitosamente",
+        addedComment: newComment,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Se produjo un fallo al insertar el comentario en la DB",
+      });
+    }
   }
 
   client.close();

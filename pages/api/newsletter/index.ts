@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
+import { connectToDatabase, insertDocument } from "../../../util/helpers";
 
 type NewsletterPOSTResponseData = {
   message: string;
@@ -15,24 +16,35 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const userEmail: string = req.body.email;
+    let client: MongoClient;
+
     if (!userEmail || userEmail.trim() === "" || !userEmail.includes("@")) {
       // status code for wrong user input
       res.status(422).json({ message: "error en el email" });
       return;
     }
 
-    const uri =
-      "mongodb+srv://pablo:jqZvb5vhiyqNNHGk@clusterpuntosapp.cfo6t.mongodb.net/?retryWrites=true&w=majority";
-    const client = new MongoClient(uri);
+    try {
+      client = await connectToDatabase();
+    } catch (error) {
+      // status code that something went wrong on the server
+      res.status(500).json({
+        message: "Se produjo un fallo al conectar con la DB",
+      });
+      return;
+    }
 
-    const database = client.db("events_app");
-
-    const newsletterEmails =
-      database.collection<NewsletterEmailCollection>("newsletter");
-
-    await newsletterEmails.insertOne({ email: userEmail });
-
-    client.close();
+    try {
+      await insertDocument<NewsletterEmailCollection>(client, "newsletter", {
+        email: userEmail,
+      });
+      client.close();
+    } catch (error) {
+      res.status(500).json({
+        message: "Se produjo un fallo al insertar los datos a la DB",
+      });
+      return;
+    }
 
     // status code for resource added or saved correctly
     res.status(201).json({ message: "agregado exitosamente" });
